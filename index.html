@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ai选股日报中心 · 全部报告浏览</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg: #f5f6f8;
+  --card: #fff;
+  --primary: #3742fa;
+  --red: #ff4757;
+  --green: #2ed573;
+  --orange: #ffa502;
+  --text: #1a1a2e;
+  --muted: #636e72;
+  --border: #e8e8e8;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.7;
+}
+
+/* ===== Header ===== */
+.header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #fff; padding: 32px 24px 28px; text-align: center;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.header h1 { font-size: 26px; margin-bottom: 6px; }
+.header .subtitle { font-size: 14px; opacity: 0.7; }
+.header .stats-row {
+  display: flex; gap: 24px; justify-content: center; margin-top: 14px; flex-wrap: wrap;
+}
+.header .stat-chip {
+  background: rgba(255,255,255,0.1); padding: 4px 16px; border-radius: 20px; font-size: 13px;
+}
+.header .stat-chip strong { color: #7bed9f; }
+
+/* ===== Layout ===== */
+.app-container {
+  max-width: 1280px; margin: 0 auto; padding: 20px;
+  display: flex; gap: 20px;
+}
+.sidebar {
+  width: 340px; flex-shrink: 0;
+  display: flex; flex-direction: column; gap: 16px;
+  position: sticky; top: 140px; max-height: calc(100vh - 160px); overflow-y: auto;
+}
+.main-content { flex: 1; min-width: 0; }
+
+/* ===== Filters ===== */
+.filter-card {
+  background: var(--card); border-radius: 12px; padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.filter-card h3 {
+  font-size: 14px; color: var(--muted); margin-bottom: 12px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.search-box {
+  width: 100%; padding: 12px 16px; border: 2px solid var(--border);
+  border-radius: 10px; font-size: 15px; outline: none; transition: border 0.2s;
+}
+.search-box:focus { border-color: var(--primary); }
+
+.tag-filter { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.tag-btn {
+  padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 600;
+  cursor: pointer; border: 1.5px solid var(--border); background: #fff;
+  transition: all 0.2s; user-select: none;
+}
+.tag-btn:hover { border-color: var(--primary); color: var(--primary); }
+.tag-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.date-filters { display: flex; gap: 8px; align-items: center; }
+.date-filters input[type="date"] {
+  padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 13px; width: 100%;
+}
+
+.sort-select {
+  padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 13px; cursor: pointer; background: #fff; width: 100%;
+}
+
+.clear-btn {
+  width: 100%; padding: 10px; border: 1.5px solid var(--border); border-radius: 10px;
+  font-size: 13px; cursor: pointer; background: #fff; color: var(--muted);
+  transition: all 0.2s;
+}
+.clear-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* ===== Report List ===== */
+.report-count {
+  font-size: 14px; color: var(--muted); margin-bottom: 14px;
+}
+.report-list { display: flex; flex-direction: column; gap: 12px; }
+
+.report-item {
+  background: var(--card); border-radius: 12px; padding: 20px 24px;
+  cursor: pointer; transition: all 0.2s;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.report-item:hover { border-color: var(--primary); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(55,66,250,0.12); }
+.report-item.active { border-color: var(--primary); background: #f8f9ff; }
+
+.report-item .date-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, #3742fa, #5352ed);
+  color: #fff; padding: 3px 12px; border-radius: 20px; font-size: 13px; font-weight: 700;
+}
+.report-item .title { font-size: 16px; font-weight: 700; margin: 10px 0 6px; }
+.report-item .summary { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.report-item .tags-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+.report-item .mini-tag {
+  padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;
+  background: #f0f0f0; color: var(--muted);
+}
+.report-item .mini-tag.t-TMT { background: #e3f2fd; color: #1565c0; }
+.report-item .mini-tag.t-AI { background: #f3e5f5; color: #7b1fa2; }
+.report-item .mini-tag.t-止损 { background: #ffebee; color: #c62828; }
+.report-item .mini-tag.t-止盈 { background: #e8f5e9; color: #2e7d32; }
+.report-item .mini-tag.t-企稳 { background: #fff8e1; color: #f57f17; }
+.report-item .mini-tag.t-防御 { background: #e0f2f1; color: #00695c; }
+.report-item .mini-tag.t-涨停 { background: #ffe0e0; color: #e74c3c; }
+.report-item .mini-tag.t-跌停 { background: #d5f5e3; color: #27ae60; }
+
+.report-item .stats-row {
+  display: flex; gap: 14px; margin-top: 10px; font-size: 12px; color: var(--muted);
+}
+.report-item .stats-row .stat-item {
+  display: flex; align-items: center; gap: 3px;
+}
+.report-item .stats-row .up { color: var(--red); }
+.report-item .stats-row .down { color: var(--green); }
+
+/* ===== Report Viewer ===== */
+.viewer-overlay {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5); z-index: 200; backdrop-filter: blur(4px);
+}
+.viewer-overlay.show { display: flex; }
+.viewer-panel {
+  position: fixed; top: 0; right: -100%; width: 70%; max-width: 900px;
+  height: 100vh; background: var(--bg); z-index: 201;
+  transition: right 0.3s ease; overflow-y: auto;
+  box-shadow: -8px 0 30px rgba(0,0,0,0.15);
+}
+.viewer-panel.show { right: 0; }
+
+.viewer-header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #fff; padding: 20px 24px; position: sticky; top: 0; z-index: 10;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.viewer-header .title { font-size: 18px; font-weight: 700; }
+.viewer-close {
+  background: rgba(255,255,255,0.15); border: none; color: #fff;
+  width: 36px; height: 36px; border-radius: 50%; font-size: 20px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.viewer-close:hover { background: rgba(255,255,255,0.3); }
+
+.viewer-nav {
+  display: flex; gap: 8px; padding: 12px 24px; background: var(--card);
+  border-bottom: 1px solid var(--border); position: sticky; top: 72px; z-index: 9;
+}
+.viewer-nav button {
+  padding: 6px 16px; border-radius: 8px; border: 1px solid var(--border);
+  background: #fff; cursor: pointer; font-size: 13px; transition: all 0.2s;
+}
+.viewer-nav button:hover { border-color: var(--primary); color: var(--primary); }
+.viewer-nav button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.viewer-content {
+  padding: 24px 32px; max-width: 820px; margin: 0 auto;
+}
+
+/* Markdown rendered content */
+.viewer-content h1 { font-size: 24px; margin: 24px 0 16px; }
+.viewer-content h2 {
+  font-size: 20px; margin: 28px 0 14px; padding-bottom: 8px;
+  border-bottom: 2px solid var(--border); color: var(--primary);
+}
+.viewer-content h3 { font-size: 17px; margin: 20px 0 10px; color: #2d3436; }
+.viewer-content p { margin: 10px 0; line-height: 1.9; }
+.viewer-content ul, .viewer-content ol { margin: 10px 0 10px 24px; }
+.viewer-content li { margin: 6px 0; line-height: 1.8; }
+.viewer-content table {
+  width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px;
+  display: block; overflow-x: auto;
+}
+.viewer-content th {
+  background: #f8f9fa; padding: 10px 14px; text-align: left; font-weight: 700;
+  border-bottom: 2px solid #d0d0d0; white-space: nowrap;
+}
+.viewer-content td { padding: 9px 14px; border-bottom: 1px solid #f0f0f0; }
+.viewer-content tr:hover { background: #fafbfe; }
+.viewer-content code {
+  background: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-size: 13px;
+}
+.viewer-content blockquote {
+  border-left: 4px solid var(--primary); background: #eef2ff;
+  padding: 14px 20px; margin: 14px 0; border-radius: 0 8px 8px 0;
+}
+.viewer-content strong { font-weight: 700; }
+.viewer-content hr { border: none; border-top: 2px solid var(--border); margin: 24px 0; }
+
+/* ===== Loading ===== */
+.loading {
+  text-align: center; padding: 40px; color: var(--muted);
+}
+.spinner {
+  width: 36px; height: 36px; border: 3px solid var(--border);
+  border-top-color: var(--primary); border-radius: 50%;
+  animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== Empty State ===== */
+.empty-state {
+  text-align: center; padding: 60px 20px; color: var(--muted);
+}
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #aaa; }
+
+/* ===== Mobile ===== */
+@media (max-width: 900px) {
+  .app-container { flex-direction: column; padding: 12px; }
+  .sidebar {
+    width: 100%; position: static; max-height: none;
+    flex-direction: row; flex-wrap: wrap; gap: 12px;
+  }
+  .filter-card { flex: 1; min-width: 260px; }
+  .viewer-panel { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <h1>📊 Ai选股日报中心</h1>
+  <div class="subtitle">全部历史报告 · 可筛选搜索 · 在线阅读</div>
+  <div class="stats-row" id="headerStats">
+    <span class="stat-chip">共 <strong id="totalCount">--</strong> 篇报告</span>
+    <span class="stat-chip">覆盖 <strong id="dateRange">--</strong></span>
+    <span class="stat-chip">最新 <strong id="latestDate">--</strong></span>
+  </div>
+</div>
+
+<div class="app-container">
+  <!-- Sidebar Filters -->
+  <div class="sidebar">
+    <div class="filter-card">
+      <h3>🔍 关键词搜索</h3>
+      <input type="text" class="search-box" id="searchInput" placeholder="搜索标题/内容/股票名...">
+    </div>
+
+    <div class="filter-card">
+      <h3>📅 日期范围</h3>
+      <div class="date-filters" style="flex-direction:column;gap:8px">
+        <input type="date" id="dateFrom" placeholder="开始日期">
+        <input type="date" id="dateTo" placeholder="结束日期">
+      </div>
+    </div>
+
+    <div class="filter-card">
+      <h3>🏷️ 标签筛选</h3>
+      <div class="tag-filter" id="tagFilter">
+        <!-- Tags will be populated dynamically -->
+      </div>
+    </div>
+
+    <div class="filter-card">
+      <h3>⚙️ 排序</h3>
+      <select class="sort-select" id="sortSelect">
+        <option value="date-desc">日期 ↓ (最新优先)</option>
+        <option value="date-asc">日期 ↑ (最早优先)</option>
+        <option value="size-desc">篇幅 ↓ (最长优先)</option>
+        <option value="size-asc">篇幅 ↑ (最短优先)</option>
+      </select>
+    </div>
+
+    <button class="clear-btn" id="clearBtn">🗑️ 清除所有筛选</button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="report-count" id="reportCount">加载中...</div>
+    <div class="report-list" id="reportList">
+      <div class="loading">
+        <div class="spinner"></div>
+        正在加载报告列表...
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Report Viewer Overlay -->
+<div class="viewer-overlay" id="viewerOverlay"></div>
+<div class="viewer-panel" id="viewerPanel">
+  <div class="viewer-header">
+    <div class="title" id="viewerTitle">报告标题</div>
+    <button class="viewer-close" id="viewerClose">✕</button>
+  </div>
+  <div class="viewer-nav">
+    <button id="prevBtn">← 上一篇</button>
+    <button id="nextBtn">下一篇 →</button>
+  </div>
+  <div class="viewer-content" id="viewerContent">
+    <div class="loading"><div class="spinner"></div>加载中...</div>
+  </div>
+</div>
+
+<script>
+let allReports = [];
+let filteredReports = [];
+let activeTags = new Set();
+let currentViewerIndex = -1;
+
+// ===== Init =====
+async function init() {
+  try {
+    const resp = await fetch('metadata.json');
+    allReports = await resp.json();
+    filteredReports = [...allReports];
+
+    updateHeaderStats();
+    renderTagFilter();
+    applyFilters();
+
+  } catch (e) {
+    document.getElementById('reportList').innerHTML =
+      '<div class="empty-state"><div class="icon">⚠️</div>加载失败，请刷新重试</div>';
+    console.error(e);
+  }
+}
+
+function updateHeaderStats() {
+  document.getElementById('totalCount').textContent = allReports.length;
+  if (allReports.length > 0) {
+    const dates = allReports.map(r => r.date).sort();
+    document.getElementById('dateRange').textContent = `${dates[0]} ~ ${dates[dates.length-1]}`;
+    document.getElementById('latestDate').textContent = dates[dates.length-1];
+  }
+}
+
+// ===== Tag Filter =====
+function renderTagFilter() {
+  const allTags = new Set();
+  allReports.forEach(r => (r.tags || []).forEach(t => allTags.add(t)));
+
+  const container = document.getElementById('tagFilter');
+  container.innerHTML = '';
+
+  Array.from(allTags).sort().forEach(tag => {
+    const btn = document.createElement('span');
+    btn.className = 'tag-btn';
+    btn.textContent = tag;
+    btn.dataset.tag = tag;
+    btn.onclick = () => toggleTag(tag, btn);
+    container.appendChild(btn);
+  });
+}
+
+function toggleTag(tag, btn) {
+  if (activeTags.has(tag)) {
+    activeTags.delete(tag);
+    btn.classList.remove('active');
+  } else {
+    activeTags.add(tag);
+    btn.classList.add('active');
+  }
+  applyFilters();
+}
+
+// ===== Filters =====
+function applyFilters() {
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  const dateFrom = document.getElementById('dateFrom').value;
+  const dateTo = document.getElementById('dateTo').value;
+  const sortBy = document.getElementById('sortSelect').value;
+
+  filteredReports = allReports.filter(r => {
+    // Date filter
+    if (dateFrom && r.date < dateFrom) return false;
+    if (dateTo && r.date > dateTo) return false;
+
+    // Tag filter
+    if (activeTags.size > 0) {
+      const hasTag = (r.tags || []).some(t => activeTags.has(t));
+      if (!hasTag) return false;
+    }
+
+    // Search filter
+    if (search) {
+      const haystack = (r.title + ' ' + r.summary + ' ' + (r.tags || []).join(' ') + ' ' + r.date).toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
+
+    return true;
+  });
+
+  // Sort
+  const [field, order] = sortBy.split('-');
+  filteredReports.sort((a, b) => {
+    let valA = a[field === 'date' ? 'date' : 'size'];
+    let valB = b[field === 'date' ? 'date' : 'size'];
+    if (order === 'desc') return valB > valA ? 1 : -1;
+    return valA > valB ? 1 : -1;
+  });
+
+  renderReportList();
+}
+
+function renderReportList() {
+  const container = document.getElementById('reportList');
+  const countEl = document.getElementById('reportCount');
+
+  countEl.textContent = `共 ${filteredReports.length} 篇报告`;
+
+  if (filteredReports.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">📭</div>没有匹配的报告，试试调整筛选条件</div>';
+    return;
+  }
+
+  container.innerHTML = filteredReports.map((r, idx) => {
+    const tagsHtml = (r.tags || []).map(t => {
+      let cls = '';
+      if (t === 'TMT') cls = 't-TMT';
+      else if (t === 'AI应用') cls = 't-AI';
+      else if (t === '止损') cls = 't-止损';
+      else if (t === '止盈') cls = 't-止盈';
+      else if (t === '企稳') cls = 't-企稳';
+      else if (t === '防御') cls = 't-防御';
+      else if (t === '涨停') cls = 't-涨停';
+      else if (t === '跌停') cls = 't-跌停';
+      return `<span class="mini-tag ${cls}">${t}</span>`;
+    }).join('');
+
+    let statsHtml = '';
+    const s = r.stats || {};
+    const parts = [];
+    if (s.adj_score) parts.push(`ADJ: <strong>${s.adj_score}</strong>`);
+    if (s.sh_index) parts.push(`上证: <strong>${s.sh_index}</strong>`);
+    if (s.limit_up !== undefined) parts.push(`涨停: <strong class="up">${s.limit_up}</strong>`);
+    if (s.limit_down !== undefined) parts.push(`跌停: <strong class="down">${s.limit_down}</strong>`);
+    if (s.volume) parts.push(`成交: <strong>${s.volume}万亿</strong>`);
+    if (s.stabilize) parts.push(`企稳: <strong>${s.stabilize}</strong>`);
+    if (parts.length > 0) statsHtml = `<div class="stats-row">${parts.map(p => `<span class="stat-item">${p}</span>`).join('')}</div>`;
+
+    return `
+      <div class="report-item" onclick="openReport(${idx})">
+        <span class="date-badge">📅 ${r.date}</span>
+        <div class="title">${r.title}</div>
+        <div class="summary">${r.summary || '暂无摘要'}</div>
+        ${tagsHtml ? `<div class="tags-row">${tagsHtml}</div>` : ''}
+        ${statsHtml}
+      </div>
+    `;
+  }).join('');
+}
+
+// ===== Viewer =====
+async function openReport(index) {
+  currentViewerIndex = index;
+  const report = filteredReports[index];
+
+  // Highlight active item
+  document.querySelectorAll('.report-item').forEach((el, i) => {
+    el.classList.toggle('active', i === index);
+  });
+
+  // Show panel
+  document.getElementById('viewerOverlay').classList.add('show');
+  document.getElementById('viewerPanel').classList.add('show');
+  document.getElementById('viewerTitle').textContent = `${report.date} · ${report.title}`;
+
+  // Load content
+  const contentEl = document.getElementById('viewerContent');
+  contentEl.innerHTML = '<div class="loading"><div class="spinner"></div>加载报告内容...</div>';
+
+  // Scroll to top
+  document.getElementById('viewerPanel').scrollTop = 0;
+
+  try {
+    const resp = await fetch(`reports/${report.filename}`);
+    const md = await resp.text();
+    const html = marked.parse(md);
+    contentEl.innerHTML = html;
+  } catch (e) {
+    contentEl.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div>加载失败: ${e.message}</div>`;
+  }
+
+  // Update nav buttons
+  document.getElementById('prevBtn').disabled = index <= 0;
+  document.getElementById('nextBtn').disabled = index >= filteredReports.length - 1;
+}
+
+function closeViewer() {
+  document.getElementById('viewerOverlay').classList.remove('show');
+  document.getElementById('viewerPanel').classList.remove('show');
+  document.querySelectorAll('.report-item').forEach(el => el.classList.remove('active'));
+  currentViewerIndex = -1;
+}
+
+function navReport(direction) {
+  if (currentViewerIndex < 0) return;
+  const newIndex = currentViewerIndex + direction;
+  if (newIndex >= 0 && newIndex < filteredReports.length) {
+    openReport(newIndex);
+  }
+}
+
+// ===== Event Listeners =====
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('dateFrom').addEventListener('change', applyFilters);
+document.getElementById('dateTo').addEventListener('change', applyFilters);
+document.getElementById('sortSelect').addEventListener('change', applyFilters);
+document.getElementById('viewerClose').addEventListener('click', closeViewer);
+document.getElementById('viewerOverlay').addEventListener('click', closeViewer);
+document.getElementById('prevBtn').addEventListener('click', () => navReport(-1));
+document.getElementById('nextBtn').addEventListener('click', () => navReport(1));
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('dateFrom').value = '';
+  document.getElementById('dateTo').value = '';
+  document.getElementById('sortSelect').value = 'date-desc';
+  activeTags.clear();
+  document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+  applyFilters();
+});
+
+// Keyboard nav
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeViewer();
+  if (currentViewerIndex >= 0) {
+    if (e.key === 'ArrowLeft') navReport(-1);
+    if (e.key === 'ArrowRight') navReport(1);
+  }
+});
+
+// Configure marked
+if (window.marked) {
+  marked.setOptions({ breaks: true, gfm: true });
+}
+
+// Start
+init();
+</script>
+</body>
+</html>
