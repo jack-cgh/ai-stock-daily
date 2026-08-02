@@ -1,5 +1,31 @@
 [
   {
+    "date": "2026-08-02",
+    "filename": "stock_pick_report_2026-08-02.md",
+    "title": "Ai选股日报 · 2026-08-02（周日）",
+    "summary": "ADJ_SCORE = 18.74（↑2.80 from 15.94！）⬆️ 明显改善",
+    "tags": [
+      "AI应用",
+      "TMT",
+      "企稳",
+      "医药",
+      "周期",
+      "新能源",
+      "止损",
+      "止盈",
+      "消费",
+      "涨停",
+      "跌停",
+      "金融",
+      "防御"
+    ],
+    "stats": {
+      "stabilize": "5/5"
+    },
+    "type": "daily",
+    "size": 27821
+  },
+  {
     "date": "2026-08-01",
     "filename": "stock_pick_report_2026-08-01.md",
     "title": "Ai选股日报 · 2026-08-01",
