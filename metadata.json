@@ -1,5 +1,32 @@
 [
   {
+    "date": "2026-08-03",
+    "filename": "stock_pick_report_2026-08-03.md",
+    "title": "Ai选股日报 · 2026-08-03（周一）",
+    "summary": "ADJ_SCORE = 18.44（持平）",
+    "tags": [
+      "AI应用",
+      "TMT",
+      "企稳",
+      "医药",
+      "周期",
+      "新能源",
+      "止损",
+      "止盈",
+      "消费",
+      "涨停",
+      "跌停",
+      "金融",
+      "防御"
+    ],
+    "stats": {
+      "limit_up": 83,
+      "limit_down": 9
+    },
+    "type": "daily",
+    "size": 24879
+  },
+  {
     "date": "2026-08-02",
     "filename": "stock_pick_report_2026-08-02.md",
     "title": "Ai选股日报 · 2026-08-02（周日）",
