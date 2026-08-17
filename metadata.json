@@ -1,5 +1,31 @@
 [
   {
+    "date": "2026-08-17",
+    "filename": "stock_pick_report_2026-08-17.md",
+    "title": "Ai选股日报 · 2026-08-17（周一收盘版）",
+    "summary": "**五大维度评分**（westock-mcp data_market_overview，8/17收盘）：",
+    "tags": [
+      "AI应用",
+      "TMT",
+      "企稳",
+      "医药",
+      "周期",
+      "新能源",
+      "止损",
+      "止盈",
+      "消费",
+      "涨停",
+      "跌停",
+      "防御"
+    ],
+    "stats": {
+      "limit_up": 95,
+      "volume": 2.39
+    },
+    "type": "daily",
+    "size": 25842
+  },
+  {
     "date": "2026-08-16",
     "filename": "stock_pick_report_2026-08-16.md",
     "title": "Ai选股日报 · 2026-08-16（周日复盘版）",
