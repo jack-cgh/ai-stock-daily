@@ -1,5 +1,31 @@
 [
   {
+    "date": "2026-11-17",
+    "filename": "stock_pick_report_2026-11-17.md",
+    "title": "Ai选股日报 · 2026-11-17",
+    "summary": "上期（11/16 周一·P0 首战兑现日）核心结论与今日验证：",
+    "tags": [
+      "TMT",
+      "企稳",
+      "周期",
+      "止损",
+      "止盈",
+      "消费",
+      "涨停",
+      "跌停",
+      "金融",
+      "防御"
+    ],
+    "stats": {
+      "sh_index": 3565.59,
+      "limit_up": 51,
+      "limit_down": 110,
+      "volume": 1.4577
+    },
+    "type": "daily",
+    "size": 15256
+  },
+  {
     "date": "2026-11-16",
     "filename": "stock_pick_report_2026-11-16.md",
     "title": "Ai选股日报 · 2026-11-16",
