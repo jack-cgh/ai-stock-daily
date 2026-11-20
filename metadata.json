@@ -1,5 +1,30 @@
 [
   {
+    "date": "2026-11-20",
+    "filename": "stock_pick_report_2026-11-20.md",
+    "title": "Ai选股日报 · 2026-11-20",
+    "summary": "- **上期推荐 0 只**（ADJ 28 < 35 禁开仓 + 情绪冰点容错率低），累计推荐维持 **58 只**。",
+    "tags": [
+      "TMT",
+      "企稳",
+      "周期",
+      "止损",
+      "止盈",
+      "涨停",
+      "跌停",
+      "金融",
+      "防御"
+    ],
+    "stats": {
+      "sh_index": 3533.79,
+      "limit_up": 30,
+      "limit_down": 61,
+      "volume": 1.42
+    },
+    "type": "daily",
+    "size": 16839
+  },
+  {
     "date": "2026-11-19",
     "filename": "stock_pick_report_2026-11-19.md",
     "title": "Ai选股日报 · 2026-11-19",
