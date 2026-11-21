@@ -1,5 +1,31 @@
 [
   {
+    "date": "2026-11-21",
+    "filename": "stock_pick_report_2026-11-21.md",
+    "title": "Ai选股日报 · 2026-11-21",
+    "summary": "**上期推荐 0 只**（ADJ 21 触及 LIQUIDATE 边界），累计推荐维持 **58 只**。",
+    "tags": [
+      "TMT",
+      "企稳",
+      "周期",
+      "新能源",
+      "止损",
+      "止盈",
+      "消费",
+      "涨停",
+      "跌停",
+      "金融",
+      "防御"
+    ],
+    "stats": {
+      "sh_index": 3533.79,
+      "limit_up": 30,
+      "limit_down": 61
+    },
+    "type": "daily",
+    "size": 26619
+  },
+  {
     "date": "2026-11-20",
     "filename": "stock_pick_report_2026-11-20.md",
     "title": "Ai选股日报 · 2026-11-20",
